@@ -30,6 +30,11 @@ jobs:
           name: clamav_lambda_layer.zip
           path: clamav_lambda_layer.zip
 
+      - name: Create Release Tag
+        if: ${{ github.ref == 'refs/heads/automate' }}
+        id: create_tag
+        run: echo "::set-output name=tag::0.1.$(git rev-parse --short HEAD)"
+
       - name: Create Release
         if: ${{ github.ref == 'refs/heads/automate' }}
         id: create_release
@@ -37,8 +42,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ "tag::0.1.$(git rev-parse --short HEAD)" }}
-          release_name: Release ${{ "tag::0.1.$(git rev-parse --short HEAD)" }}
+          tag_name: ${{ steps.create_tag.outputs.tag }}
+          release_name: Release ${{ steps.create_tag.outputs.tag }}
           draft: false
           prerelease: false
 
