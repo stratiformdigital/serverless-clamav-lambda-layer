@@ -1,8 +1,6 @@
 .serverless/
 node_modules/
-layer/lib
-layer/bin
-layer/etc
-layer/var
+layer/*
+clamav_lambda_layer.zip
 coverage/
 .DS_Store
