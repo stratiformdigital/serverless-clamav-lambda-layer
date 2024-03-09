@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - "*"
+
+concurrency:
+  group: ${{ github.ref_name }}-release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Run Build Script
+        run: |
+          chmod +x ./build.sh
+          ./build.sh
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: clamav_lambda_layer.zip
+          path: clamav_lambda_layer.zip
+
+      - name: Create Release Tag
+        if: ${{ github.ref == 'refs/heads/master' }}
+        id: create_tag
+        run: echo "::set-output name=tag::0.1.$(git rev-parse --short HEAD)"
+
+      - name: Create Release
+        if: ${{ github.ref == 'refs/heads/master' }}
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.tag }}
+          release_name: Release ${{ steps.create_tag.outputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./clamav_lambda_layer.zip
+          asset_name: clamav_lambda_layer.zip
+          asset_content_type: application/zip
