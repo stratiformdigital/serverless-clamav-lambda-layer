@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - automate
 
 concurrency:
   group: ${{ github.ref_name }}-release
