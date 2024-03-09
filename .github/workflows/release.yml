@@ -33,7 +33,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ github.ref != 'refs/heads/automate' }}
+    if: ${{ github.ref == 'refs/heads/automate' }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
