@@ -3,8 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - main
-      - automate
+      - "*"
 
 concurrency:
   group: ${{ github.ref_name }}-release
@@ -31,12 +30,12 @@ jobs:
           path: clamav_lambda_layer.zip
 
       - name: Create Release Tag
-        if: ${{ github.ref == 'refs/heads/automate' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         id: create_tag
         run: echo "::set-output name=tag::0.1.$(git rev-parse --short HEAD)"
 
       - name: Create Release
-        if: ${{ github.ref == 'refs/heads/automate' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -48,7 +47,7 @@ jobs:
           prerelease: false
 
       - name: Upload Release Asset
-        if: ${{ github.ref == 'refs/heads/automate' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
